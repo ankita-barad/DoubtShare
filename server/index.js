@@ -7,7 +7,11 @@ import doubtRouter from "./routes/doubt.js";
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+  })
+);
 
 app.use("/user", userRouter);
 app.use("/subject", subjectRouter);
