@@ -13,6 +13,6 @@ app.use("/user", userRouter);
 app.use("/subject", subjectRouter);
 app.use("/doubt", doubtRouter);
 
-app.listen(3300, async () => {
+app.listen(process.env.PORT ?? 3300, async () => {
   console.log("server started on port 3300");
 });
