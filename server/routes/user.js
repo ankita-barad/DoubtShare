@@ -52,35 +52,40 @@ userRouter.post("/register", async (req, res, next) => {
 //login
 
 userRouter.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  // Query user from Supabase by email
-  const { data, error } = await supabase
-    .from("user")
-    .select("id, email, password")
-    .eq("email", email)
-    .single();
+    // Query user from Supabase by email
+    const { data, error } = await supabase
+      .from("user")
+      .select("id, email, password")
+      .eq("email", email)
+      .single();
 
-  if (error) {
-    console.error(error);
+    if (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    if (!data) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, data.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const token = jwt.sign(
+      { id: data.id, email: data.email },
+      process.env.SECRET_KEY
+    );
+    res.json({ token });
+  } catch (error) {
+    console.log(error);
     return res.status(500).json({ error: "Internal Server Error" });
   }
-
-  if (!data) {
-    return res.status(401).json({ error: "Invalid credentials" });
-  }
-
-  const passwordMatch = await bcrypt.compare(password, data.password);
-
-  if (!passwordMatch) {
-    return res.status(401).json({ error: "Invalid credentials" });
-  }
-
-  const token = jwt.sign(
-    { id: data.id, email: data.email },
-    process.env.SECRET_KEY
-  );
-  res.json({ token });
 });
 
 export default userRouter;

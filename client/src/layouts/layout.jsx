@@ -1,25 +1,74 @@
 import { Link, Navigate, Outlet, useNavigate } from "react-router-dom";
 import { isAuthenticated } from "../lib/utils.js";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getMe } from "../services/user.api.js";
+import { getUser } from "../lib/utils.js";
+import { socket } from "../socket.js";
+import { NewDoubtSnack } from "../components/new-doubt-snack.jsx";
+import { acceptDoubt } from "../services/doubt.api.js";
 
 export default function Layout() {
   const navigate = useNavigate();
 
+  const token = isAuthenticated();
+
+  const [newDoubt, setNewDoubt] = useState(null);
+
   useEffect(() => {
+    if (!token) return;
     getMe().then((user) => {
       localStorage.setItem("user", JSON.stringify(user));
     });
-  }, []);
+  }, [token]);
 
-  if (!isAuthenticated()) {
+  const user = getUser();
+
+  useEffect(() => {
+    if (!user || !user.id) return;
+
+    socket.connect();
+
+    function onConnect() {
+      console.log("CONNECTED");
+      socket.emit("online", user.id);
+    }
+
+    function onDisconnect() {
+      console.log("DISCONNECTED");
+      socket.emit("offline", user.id);
+    }
+
+    function handleNewDoubt(doubt) {
+      console.log("GOT A DOUBT", doubt);
+      setNewDoubt(doubt);
+    }
+
+    socket.on("new_doubt", handleNewDoubt);
+
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+    };
+  }, [user]);
+
+  if (!token) {
     return <Navigate to="/auth/login" replace={true} />;
   }
 
   const handleLogout = () => {
     localStorage.removeItem("dstoken");
     localStorage.removeItem("user");
+    socket.emit("offline", user.id);
+    socket.disconnect();
     navigate(0);
+  };
+
+  const onAccept = async () => {
+    await acceptDoubt(newDoubt.id);
+    navigate(`/doubt/${newDoubt.id}`);
   };
 
   return (
@@ -31,16 +80,31 @@ export default function Layout() {
 
         <nav className="flex gap-2 underline">
           <Link to="/">Home</Link>
-          <Link to="/doubt/create">Create Doubt</Link>
+          {user?.role === "STUDENT" && (
+            <Link to="/doubt/create">Create Doubt</Link>
+          )}
         </nav>
-        <button
-          onClick={handleLogout}
-          className="text-gray-300 hover:text-white"
-        >
-          Logout
-        </button>
-      </div>
 
+        <div className="flex  items-center gap-2">
+          <p>
+            {user?.name} ({socket.connected && "online"})
+          </p>
+          <p>{user?.role}</p>
+          <button
+            onClick={handleLogout}
+            className="text-gray-300 hover:text-white underline"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+      {newDoubt && (
+        <NewDoubtSnack
+          {...newDoubt}
+          onAccept={onAccept}
+          onClose={() => setNewDoubt(null)}
+        />
+      )}
       <Outlet />
     </div>
   );

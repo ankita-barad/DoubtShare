@@ -11,7 +11,7 @@ export const auth = async (req, res, next) => {
 
     const { data: user } = await supabase
       .from("user")
-      .select("id, email, role, name, grade, language")
+      .select("id, email, role, name, grade, language, socket_id")
       .eq("id", id)
       .single();
 

@@ -1,4 +1,6 @@
 /* eslint-disable react/prop-types */
+import { Link } from "react-router-dom";
+
 export const DoubtCard = ({
   content,
   id,
@@ -9,7 +11,9 @@ export const DoubtCard = ({
 }) => {
   return (
     <div className="max-w-md mx-auto my-8 p-6 bg-white rounded-md shadow-md">
-      <h2 className="text-2xl font-semibold mb-4">Question #{id}</h2>
+      <Link to={`/doubt/${id}`}>
+        <h2 className="text-2xl font-semibold mb-4 underline">Doubt #{id}</h2>
+      </Link>
       <p className="text-gray-600 mb-4">{content}</p>
 
       <div className="flex justify-between mb-4">

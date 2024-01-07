@@ -46,6 +46,57 @@ export const getDoubt = async (id) => {
   }
 };
 
+export const acceptDoubt = async (id) => {
+  try {
+    const token = isAuthenticated();
+    if (!token) {
+      return;
+    }
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/doubt/${id}/accept`,
+      {
+        method: "put",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const sendMessage = async ({ text, userId, doubtId }) => {
+  try {
+    const token = isAuthenticated();
+    if (!token) {
+      return;
+    }
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/doubt/${doubtId}/chat`,
+      {
+        method: "post",
+        body: JSON.stringify({
+          text,
+          userId,
+          doubtId,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const createDoubt = async ({ content, subjectId }) => {
   try {
     const token = isAuthenticated();

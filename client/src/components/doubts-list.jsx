@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-
 import { DoubtCard } from "./doubt-card";
 
 export const DoubtsList = ({ doubts }) => {

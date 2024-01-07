@@ -3,5 +3,11 @@ export const isAuthenticated = () => {
 };
 
 export const getUser = () => {
-  return localStorage.getItem("user");
+  try {
+    const user = localStorage.getItem("user");
+    return JSON.parse(user);
+  } catch (error) {
+    console.log(error);
+  }
+  return;
 };
