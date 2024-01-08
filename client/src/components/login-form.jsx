@@ -8,23 +8,25 @@ export const LoginForm = () => {
   // State variables for form fields
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // For now, just log the form data
-    console.log({
-      email,
-      password,
-    });
-
-    await login({
-      email,
-      password,
-    });
-    navigate(0);
+    try {
+      setLoading(true);
+      await login({
+        email,
+        password,
+      });
+      navigate(0);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -67,9 +69,10 @@ export const LoginForm = () => {
         {/* Submit Button */}
         <button
           type="submit"
+          disabled={loading}
           className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
         >
-          Login
+          {loading ? "Loading" : "Login"}
         </button>
       </form>
     </div>

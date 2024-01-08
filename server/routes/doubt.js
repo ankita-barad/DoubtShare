@@ -175,4 +175,31 @@ doubtRouter.put("/:doubtId/accept", auth, async (req, res, next) => {
   }
 });
 
+doubtRouter.put("/:doubtId/resolve", auth, async (req, res, next) => {
+  try {
+    const doubtId = req.params.doubtId;
+
+    const { data, error } = await supabase
+      .from("doubt")
+      .update({
+        resolved: true,
+      })
+      .eq("id", doubtId);
+
+    if (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    if (!data) {
+      return res.status(404).json({ error: "Doubt not found" });
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
 export default doubtRouter;

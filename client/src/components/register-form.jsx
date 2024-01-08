@@ -3,6 +3,7 @@ import { useState } from "react";
 import { RoleDropdown } from "./role-dropdown";
 import { GradeDropdown } from "./grade-dropdown";
 import { LanguageDropdown } from "./language-dropdown";
+import { useNavigate } from "react-router-dom";
 import { register } from "../services/user.api";
 
 // Define the RegisterForm component
@@ -14,31 +15,29 @@ export const RegisterForm = () => {
   const [name, setName] = useState("");
   const [grade, setGrade] = useState("");
   const [language, setLanguage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Add your logic here to handle the form data, like sending it to a server
-
-    // For now, just log the form data
-    console.log({
-      email,
-      password,
-      role,
-      name,
-      grade,
-      language,
-    });
-
-    await register({
-      email,
-      password,
-      role,
-      name,
-      grade,
-      language,
-    });
+    try {
+      setLoading(true);
+      await register({
+        email,
+        password,
+        role,
+        name,
+        grade,
+        language,
+      });
+      navigate("/auth/login");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -64,10 +63,7 @@ export const RegisterForm = () => {
 
         {/* Password Field */}
         <div className="mb-4">
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-600"
-          >
+          <label htmlFor="password" className="block text-sm font-medium">
             Password
           </label>
           <input
@@ -108,9 +104,10 @@ export const RegisterForm = () => {
         {/* Submit Button */}
         <button
           type="submit"
+          disabled={loading}
           className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
         >
-          Register
+          {loading ? "Loading" : "Register"}
         </button>
       </form>
     </div>

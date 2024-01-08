@@ -72,40 +72,40 @@ export default function Layout() {
   };
 
   return (
-    <div className="flex flex-col h-screen">
-      <div className="bg-gray-800 text-white p-4  flex justify-between items-center">
-        <Link to="/">
-          <h1 className="text-2xl font-semibold">DoubtShare</h1>
-        </Link>
+    <div className="bg-gray-400">
+      <div className="flex flex-col  w-4/6 mx-auto">
+        <div className="bg-gray-800 text-white p-4  flex justify-between items-center">
+          <Link to="/">
+            <h1 className="text-2xl font-semibold">DoubtShare</h1>
+          </Link>
 
-        <nav className="flex gap-2 underline">
-          <Link to="/">Home</Link>
-          {user?.role === "STUDENT" && (
-            <Link to="/doubt/create">Create Doubt</Link>
-          )}
-        </nav>
+          <nav className="flex gap-2 underline">
+            <Link to="/">Home</Link>
+            {user?.role === "STUDENT" && (
+              <Link to="/doubt/create">Create Doubt</Link>
+            )}
+          </nav>
 
-        <div className="flex  items-center gap-2">
-          <p>
-            {user?.name} ({socket.connected && "online"})
-          </p>
-          <p>{user?.role}</p>
-          <button
-            onClick={handleLogout}
-            className="text-gray-300 hover:text-white underline"
-          >
-            Logout
-          </button>
+          <div className="flex  items-center gap-2">
+            <p>{user?.name}</p>
+            <p>{user?.role}</p>
+            <button
+              onClick={handleLogout}
+              className="text-gray-300 hover:text-white underline"
+            >
+              Logout
+            </button>
+          </div>
         </div>
+        {newDoubt && (
+          <NewDoubtSnack
+            {...newDoubt}
+            onAccept={onAccept}
+            onClose={() => setNewDoubt(null)}
+          />
+        )}
+        <Outlet />
       </div>
-      {newDoubt && (
-        <NewDoubtSnack
-          {...newDoubt}
-          onAccept={onAccept}
-          onClose={() => setNewDoubt(null)}
-        />
-      )}
-      <Outlet />
     </div>
   );
 }

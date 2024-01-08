@@ -46,6 +46,29 @@ export const getDoubt = async (id) => {
   }
 };
 
+export const resolveDoubt = async (id) => {
+  try {
+    const token = isAuthenticated();
+    if (!token) {
+      return;
+    }
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/doubt/${id}/resolve`,
+      {
+        method: "put",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const acceptDoubt = async (id) => {
   try {
     const token = isAuthenticated();

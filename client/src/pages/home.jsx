@@ -19,7 +19,7 @@ export default function Home() {
           <DoubtsList doubts={doubts} />
         </div>
 
-        <div className="w-1/3 p-4 bg-gray-300">
+        <div className="flex-grow p-4 bg-gray-300">
           <h2 className="text-xl font-semibold mb-4">Resolved Doubts</h2>
           <DoubtsList doubts={resolvedDoubts} />
         </div>
